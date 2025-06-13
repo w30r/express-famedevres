@@ -92,7 +92,6 @@ app.get("/workers", async (_req, res) => {
  */
 app.post("/worker", async (req, res) => {
   const worker = new Worker({
-    id: req.body.id,
     name: req.body.name,
     phoneNumber: req.body.phoneNumber,
     status: req.body.status,
@@ -108,6 +107,23 @@ app.post("/worker", async (req, res) => {
     res.status(400).json({ message: error.message });
   }
   console.log("POST /worker");
+});
+
+// DELETE all workers
+/**
+ * @swagger
+ * /workers:
+ *   delete:
+ *     tags: [Workers]
+ *     summary: Delete all workers
+ *     responses:
+ *       200:
+ *         description: All workers deleted
+ */
+app.delete("/workers", async (req, res) => {
+  await Worker.deleteMany();
+  res.status(200).json({ message: "All workers deleted" });
+  console.log("DELETE /workers");
 });
 
 // Swagger schema for Worker
