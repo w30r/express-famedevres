@@ -1,0 +1,145 @@
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import Worker from "./models/worker.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
+
+dotenv.config();
+
+const app = express();
+const port = 3000;
+const swaggerSpec = swaggerJSDoc({
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "my api",
+      version: "1.0.0",
+    },
+  },
+  apis: ["./index.js"], // or ['./routes/*.ts'] if you split routes
+});
+
+app.use(express.json());
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("connected to mongo"))
+  .catch((err) => console.error("mongo error:", err));
+
+// GET hello world
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     tags: [Init]
+ *     summary: Returns a hello world message
+ *     responses:
+ *       200:
+ *         description: A simple hello world message
+ */
+app.get("/", (_req, res) => {
+  res.send("hello world");
+});
+
+// GET workers
+/**
+ * @swagger
+ * /workers:
+ *   get:
+ *     tags: [Workers]
+ *     summary: Get all workers
+ *     responses:
+ *       200:
+ *         description: A list of workers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Worker'
+ */
+app.get("/workers", async (_req, res) => {
+  const workers = await Worker.find();
+  res.json(workers);
+  console.log("GET /workers");
+});
+
+// POST worker
+/**
+ * @swagger
+ * /worker:
+ *   post:
+ *     tags: [Workers]
+ *     summary: Create a new worker
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Worker'
+ *     responses:
+ *       201:
+ *         description: The created worker
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Worker'
+ *       400:
+ *         description: Bad request
+ */
+app.post("/worker", async (req, res) => {
+  const worker = new Worker({
+    id: req.body.id,
+    name: req.body.name,
+    phoneNumber: req.body.phoneNumber,
+    status: req.body.status,
+    passportNumber: req.body.passportNumber,
+    permitVisaExpiry: req.body.permitVisaExpiry,
+    RMPaid: req.body.RMPaid,
+  });
+
+  try {
+    await worker.save();
+    res.status(201).json(worker);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+  console.log("POST /worker");
+});
+
+// Swagger schema for Worker
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Worker:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *         name:
+ *           type: string
+ *         nationality:
+ *           type: string
+ *         passportNumber:
+ *           type: string
+ *         permitVisaNumber:
+ *           type: string
+ *         permitVisaExpiry:
+ *           type: string
+ *           format: date
+ *         phoneNumber:
+ *           type: string
+ *         siteProject:
+ *           type: string
+ *         status:
+ *           type: string
+ */
+
+// start server
+app.listen(port, () => {
+  console.log(`server running at http://localhost:${port}`);
+});
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
