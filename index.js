@@ -109,6 +109,41 @@ app.post("/worker", async (req, res) => {
   console.log("POST /worker");
 });
 
+// DELETE worker by id
+/**
+ * @swagger
+ * /worker/{id}:
+ *   delete:
+ *     tags: [Workers]
+ *     summary: Delete a worker by id
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: The worker ID
+ *     responses:
+ *       200:
+ *         description: The deleted worker
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: Worker not found
+ */
+app.delete("/worker/:id", async (req, res) => {
+  try {
+    const worker = await Worker.findByIdAndDelete(req.params.id);
+    if (!worker) {
+      return res.status(404).json({ message: "Worker not found" });
+    }
+    res.status(200).json(worker);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+  console.log("DELETE /worker/:id");
+});
+
 // DELETE all workers
 /**
  * @swagger
