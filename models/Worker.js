@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const workerSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true },
+  id: { type: Number, required: false, unique: true },
   name: String,
   phoneNumber: String,
   status: String,
