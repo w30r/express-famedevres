@@ -4,11 +4,12 @@ import dotenv from "dotenv";
 import Worker from "./models/worker.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerJSDoc from "swagger-jsdoc";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const swaggerSpec = swaggerJSDoc({
   definition: {
     openapi: "3.0.0",
@@ -21,6 +22,7 @@ const swaggerSpec = swaggerJSDoc({
 });
 
 app.use(express.json());
+app.use(cors());
 
 mongoose
   .connect(process.env.MONGO_URI)
