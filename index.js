@@ -67,6 +67,34 @@ app.get("/workers", async (_req, res) => {
   console.log("GET /workers");
 });
 
+// GET worker by id
+/**
+ * @swagger
+ * /worker/{id}:
+ *   get:
+ *     tags: [Workers]
+ *     summary: Get a worker by id
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: integer
+ *     responses:
+ *       200:
+ *         description: A worker object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Worker'
+ */
+app.get("/worker/:id", async (req, res) => {
+  const { id } = req.params;
+  const worker = await Worker.findById(id);
+  res.json(worker);
+  console.log(`GET ${id}`);
+});
+
 // POST worker
 /**
  * @swagger
