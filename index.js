@@ -95,6 +95,44 @@ app.get("/worker/:id", async (req, res) => {
   console.log(`GET ${id}`);
 });
 
+// PUT update worker
+/**
+ * @swagger
+ * /worker/{id}/updateRMPaid:
+ *   put:
+ *     tags: [Workers]
+ *     summary: Update the RMPaid of a worker
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               RMPaid:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: The worker object with the updated RMPaid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Worker'
+ */
+app.put("/worker/:id/updateRMPaid", async (req, res) => {
+  const { id } = req.params;
+  const { RMPaid } = req.body;
+  const worker = await Worker.findByIdAndUpdate(id, { RMPaid }, { new: true });
+  res.json(worker);
+  console.log(`PUT ${id}`);
+});
+
 // POST worker
 /**
  * @swagger
