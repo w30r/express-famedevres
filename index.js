@@ -175,6 +175,45 @@ app.post("/worker", async (req, res) => {
   console.log("POST /worker");
 });
 
+// POST multiple workers
+/**
+ * @swagger
+ * /workers:
+ *   post:
+ *     tags: [Workers]
+ *     summary: Create multiple new workers
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/Worker'
+ *     responses:
+ *       201:
+ *         description: The created workers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Worker'
+ *       400:
+ *         description: Bad request
+ */
+app.post("/workers", async (req, res) => {
+  const workers = req.body.map((worker) => new Worker(worker));
+
+  try {
+    await Worker.insertMany(workers);
+    res.status(201).json(workers);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+  console.log("POST /workers");
+});
+
 // DELETE worker by id
 /**
  * @swagger
