@@ -4,10 +4,18 @@ const workerSchema = new mongoose.Schema(
   {
     name: String,
     phoneNumber: String,
-    status: String,
     passportNumber: String,
-    permitVisaExpiry: Date,
+    passportExpiry: Date,
+    visaExpiry: Date,
     RMPaid: Number,
+    status: String,
+    transactions: [
+      {
+        date: Date,
+        amount: Number,
+        note: String,
+      },
+    ],
   },
   { versionKey: false }
 );

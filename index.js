@@ -127,10 +127,17 @@ app.get("/worker/:id", async (req, res) => {
  */
 app.put("/worker/:id/updateRMPaid", async (req, res) => {
   const { id } = req.params;
-  const { RMPaid } = req.body;
-  const worker = await Worker.findByIdAndUpdate(id, { RMPaid }, { new: true });
+  const { RMPaid, note } = req.body;
+  const worker = await Worker.findByIdAndUpdate(
+    id,
+    {
+      $inc: { RMPaid },
+      $push: { transactions: { date: new Date(), amount: RMPaid, note } },
+    },
+    { new: true }
+  );
   res.json(worker);
-  console.log(`PUT ${id}`);
+  console.log(`PUT ${id} updateRMPaid ${RMPaid} ${note}`);
 });
 
 // PUT update worker
@@ -207,10 +214,11 @@ app.post("/worker", async (req, res) => {
   const worker = new Worker({
     name: req.body.name,
     phoneNumber: req.body.phoneNumber,
-    status: req.body.status,
     passportNumber: req.body.passportNumber,
-    permitVisaExpiry: req.body.permitVisaExpiry,
+    passportExpiry: req.body.passportExpiry,
+    visaExpiry: req.body.visaExpiry,
     RMPaid: req.body.RMPaid,
+    status: req.body.status,
   });
 
   try {
